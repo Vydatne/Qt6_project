@@ -7,12 +7,20 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QRegularExpressionValidator>
 
 LoginWindow::LoginWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::LoginWindow)
 {
     ui->setupUi(this);
+    QRegularExpression alphanumericRegExp("[A-Za-z0-9]+");
+
+    auto usernameValidator = new QRegularExpressionValidator(alphanumericRegExp, this);
+    ui->user_input->setValidator(usernameValidator);
+
+    auto passwordValidator = new QRegularExpressionValidator(alphanumericRegExp, this);
+    ui->pw_input->setValidator(passwordValidator);
 }
 
 LoginWindow::~LoginWindow()

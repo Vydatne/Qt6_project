@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QLineEdit>
 
 #include <QMainWindow>
 
@@ -32,5 +33,6 @@ private slots:
 private:
     Ui::mainWindow *ui;
     QString username;
+    void checkInput(QLineEdit *lineEdit, const QRegularExpression &regExp);
 };
 #endif

@@ -11,6 +11,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QRegularExpressionValidator>
+#include <QLineEdit>
+#include <QDebug>
 
 
 MainWindow::MainWindow(const QString &username, QWidget *parent) :
@@ -20,12 +23,26 @@ MainWindow::MainWindow(const QString &username, QWidget *parent) :
 {
     ui->setupUi(this);
     this->showMaximized();
+
+    QRegularExpression nameRegExp("[A-Za-z\\s]+");
+    QRegularExpression phoneRegExp("\\d{10}");
+    QRegularExpression cccdRegExp("\\d{12}");
+
+    auto nameValidator = new QRegularExpressionValidator(nameRegExp, this);
+    auto phoneValidator = new QRegularExpressionValidator(phoneRegExp, this);
+    auto cccdValidator = new QRegularExpressionValidator(cccdRegExp, this);
+
+    ui->name_input->setValidator(nameValidator);
+    ui->phonenum_input->setValidator(phoneValidator);
+    ui->ci_input->setValidator(cccdValidator);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+
 
 QString imageBase64Temp = "";
 
@@ -87,7 +104,6 @@ void MainWindow::loadUserData(const QString &username)
         reply->deleteLater();
     });
 }
-
 
 
 void MainWindow::on_saveButton_clicked()

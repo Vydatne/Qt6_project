@@ -22,7 +22,7 @@
    <enum>Qt::ContextMenuPolicy::DefaultContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>My App</string>
+   <string>Information Managemant Software</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>

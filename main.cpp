@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 
     LoginWindow loginWindow;
 
-    // connect signal
+    // connect signal // handle slot
     QObject::connect(&loginWindow, &LoginWindow::loginSuccessful, [&](const QString &username) {
         MainWindow *mainWindow = new MainWindow(username);
         mainWindow->show();
@@ -16,5 +16,5 @@ int main(int argc, char *argv[])
 
     loginWindow.show();
 
-    return a.exec();
+    return a.exec();// event loop
 }

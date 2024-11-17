@@ -33,6 +33,8 @@ MainWindow::MainWindow(const QString &username, QWidget *parent) :
     auto cccdValidator = new QRegularExpressionValidator(cccdRegExp, this);
 
     ui->name_input->setValidator(nameValidator);
+    ui->placeofbirth_input->setValidator(nameValidator);
+    ui->address_input->setValidator(nameValidator);
     ui->phonenum_input->setValidator(phoneValidator);
     ui->ci_input->setValidator(cccdValidator);
 }

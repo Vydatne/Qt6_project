@@ -29,7 +29,6 @@ private slots:
 
     void on_delete_button_clicked();
 
-
 private:
     Ui::mainWindow *ui;
     QString username;

@@ -29,7 +29,6 @@ private slots:
 
 private:
     Ui::LoginWindow *ui;
-
 };
 
 #endif

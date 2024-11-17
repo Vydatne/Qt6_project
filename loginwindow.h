@@ -17,6 +17,7 @@ public:
     explicit LoginWindow(QWidget *parent = nullptr);
     ~LoginWindow();
     void onFirebaseReply();
+    void onFirebaseReply_checkExists();
 
 signals:
     void loginSuccessful(const QString &username);

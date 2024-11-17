@@ -111,38 +111,88 @@ void LoginWindow::on_signUp_but_clicked()
         QMessageBox::warning(this, "Sign Up", "Username and password cannot be blank!");
         return;
     }
+    QString firebaseURL = "https://data-20655-default-rtdb.firebaseio.com/Account.json";
 
-
-
-    // Hash Password
-    QString hashedPassword = hashPassword(password);
-
-    // Firebase Account-user URL
-    QString firebaseURL = "https://data-20655-default-rtdb.firebaseio.com/Account/" + username + ".json";
-
-    // create json object
-    QJsonObject newUser;
-    newUser["username"] = username;
-    newUser["password"] = hashedPassword;
-
-    //create network manager
+    // Create a network manager
     QNetworkAccessManager* manager = new QNetworkAccessManager(this);
 
-    //request
+    // Create a request for Firebase (GET request)
     QNetworkRequest request;
     request.setUrl(QUrl(firebaseURL));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "Data/json");
 
-    // Put data - Firebase (PUT request)
-    QNetworkReply* reply = manager->put(request, QJsonDocument(newUser).toJson());
+    // Send GET request to retrieve the accounts data
+    QNetworkReply* reply = manager->get(request);
 
-    // Xử lý phản hồi từ Firebase
-    connect(reply, &QNetworkReply::finished, this, [=]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            QMessageBox::information(this, "Sign Up", "Account created successfully!");
-        } else {
-            QMessageBox::warning(this, "Sign Up", "Failed to create account: " + reply->errorString());
+    // Connect the reply finished signal to a slot
+    connect(reply, &QNetworkReply::finished, this, &LoginWindow::onFirebaseReply_checkExists);
+}
+
+void LoginWindow::onFirebaseReply_checkExists()
+{
+    QString username = ui->user_input->text();
+    QString password = ui->pw_input->text();
+    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+
+    if (!reply) return;
+
+    if (reply->error() != QNetworkReply::NoError) {
+        QMessageBox::warning(this, "Login", "Failed to connect to Firebase: " + reply->errorString());
+        return;
+    }
+
+    // Parse the response
+    QByteArray responseData = reply->readAll();
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(responseData);
+    QJsonObject jsonObject = jsonResponse.object();
+
+    QString storedUsername;
+    bool exists = false;
+
+    // Iterate over the retrieved JSON data (accounts data)
+    for (auto key : jsonObject.keys()) {
+        QJsonObject account = jsonObject[key].toObject();
+        storedUsername = account["username"].toString();
+        if(storedUsername == ui->user_input->text()){
+            exists = true;
         }
-        reply->deleteLater();
-    });
+    }
+
+    reply->deleteLater();
+
+    // Handle the login result
+    if (exists) {
+        QMessageBox::critical(this, "ERROR!", "Username already exists. Please choose another one.");
+    } else {
+        // Hash Password
+        QString hashedPassword = hashPassword(password);
+
+        // Firebase Account-user URL
+        QString firebaseURL = "https://data-20655-default-rtdb.firebaseio.com/Account/" + username + ".json";
+
+        // create json object
+        QJsonObject newUser;
+        newUser["username"] = username;
+        newUser["password"] = hashedPassword;
+
+        //create network manager
+        QNetworkAccessManager* manager = new QNetworkAccessManager(this);
+
+        //request
+        QNetworkRequest request;
+        request.setUrl(QUrl(firebaseURL));
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+        // Put data - Firebase (PUT request)
+        QNetworkReply* reply = manager->put(request, QJsonDocument(newUser).toJson());
+
+        // handle respone from Firebase
+        connect(reply, &QNetworkReply::finished, this, [=]() {
+            if (reply->error() == QNetworkReply::NoError) {
+                QMessageBox::information(this, "Sign Up", "Account created successfully!");
+            } else {
+                QMessageBox::warning(this, "Sign Up", "Failed to create account: " + reply->errorString());
+            }
+        });
+    }
 }
